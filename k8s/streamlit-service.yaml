@@ -1,0 +1,17 @@
+# k8s/streamlit-service.yaml
+# Service Kubernetes pour exposer le dashboard Streamlit
+# LoadBalancer → accessible depuis l'extérieur du cluster
+# Sur Docker Desktop → accessible via localhost:8501
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: churnguard-streamlit
+spec:
+  selector:
+    app: churnguard-streamlit
+  ports:
+    - protocol: TCP
+      port: 8501
+      targetPort: 8501
+  type: LoadBalancer

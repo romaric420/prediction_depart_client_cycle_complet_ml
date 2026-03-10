@@ -1,0 +1,38 @@
+# k8s/streamlit-deployment.yaml
+# Déploiement du dashboard Streamlit sur Kubernetes
+# replicas=1 → une seule instance suffit pour le dashboard
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: churnguard-streamlit
+  labels:
+    app: churnguard-streamlit
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: churnguard-streamlit
+  template:
+    metadata:
+      labels:
+        app: churnguard-streamlit
+    spec:
+      containers:
+        - name: churnguard-streamlit
+          image: churnguard-streamlit:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8501
+          env:
+            # URL de l'API via le service Kubernetes
+            # On utilise le nom du service, pas localhost
+            - name: API_URL
+              value: "http://churnguard-api:8000"
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"

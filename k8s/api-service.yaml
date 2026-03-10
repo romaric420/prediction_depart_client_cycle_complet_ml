@@ -1,0 +1,17 @@
+# k8s/api-service.yaml
+# Service Kubernetes pour exposer l'API FastAPI
+# ClusterIP → accessible uniquement depuis l'intérieur du cluster
+# Le dashboard Streamlit communique avec l'API via ce service
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: churnguard-api
+spec:
+  selector:
+    app: churnguard-api
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: 8000
+  type: ClusterIP
