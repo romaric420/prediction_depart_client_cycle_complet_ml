@@ -1,0 +1,84 @@
+# .github/workflows/ci.yml
+# Pipeline CI/CD pour ChurnGuard
+# Déclenché à chaque push sur main
+# Étapes : tests → build Docker → push vers registry
+
+name: ChurnGuard CI/CD
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+
+  # ============================================================
+  # JOB 1 — TESTS
+  # Vérifie que le code fonctionne avant de builder
+  # ============================================================
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v4
+
+      - name: Installation de uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "latest"
+
+      - name: Installation de Python 3.12
+        run: uv python install 3.12
+
+      - name: Installation des dépendances
+        run: uv sync --frozen
+
+      - name: Vérification des imports src/
+        run: |
+          uv run python -c "from src.preprocessing import preprocess; print('preprocessing OK')"
+          uv run python -c "from src.features import add_features; print('features OK')"
+          uv run python -c "from src.evaluate import compute_metrics; print('evaluate OK')"
+
+  # ============================================================
+  # JOB 2 — BUILD DOCKER
+  # Build les images uniquement si les tests passent
+  # ============================================================
+  build:
+    runs-on: ubuntu-latest
+    needs: test    # attend que le job test soit vert
+
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v4
+
+      - name: Login Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build et push image API
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/Dockerfile.api
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/churnguard-api:latest
+
+      - name: Build et push image Streamlit
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/Dockerfile.streamlit
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/churnguard-streamlit:latest
+```
+
+Ensuite ajoute les secrets Docker Hub sur GitHub :
+```
+GitHub → ton repo → Settings → Secrets and variables → Actions → New secret
+
+DOCKER_USERNAME → ton username Docker Hub
+DOCKER_PASSWORD → ton password Docker Hub
