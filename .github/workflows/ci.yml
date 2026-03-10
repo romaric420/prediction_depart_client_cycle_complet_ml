@@ -1,8 +1,3 @@
-# .github/workflows/ci.yml
-# Pipeline CI/CD pour ChurnGuard
-# Déclenché à chaque push sur main
-# Étapes : tests → build Docker → push vers registry
-
 name: ChurnGuard CI/CD
 
 on:
@@ -13,10 +8,6 @@ on:
 
 jobs:
 
-  # ============================================================
-  # JOB 1 — TESTS
-  # Vérifie que le code fonctionne avant de builder
-  # ============================================================
   test:
     runs-on: ubuntu-latest
 
@@ -41,13 +32,9 @@ jobs:
           uv run python -c "from src.features import add_features; print('features OK')"
           uv run python -c "from src.evaluate import compute_metrics; print('evaluate OK')"
 
-  # ============================================================
-  # JOB 2 — BUILD DOCKER
-  # Build les images uniquement si les tests passent
-  # ============================================================
   build:
     runs-on: ubuntu-latest
-    needs: test    # attend que le job test soit vert
+    needs: test
 
     steps:
       - name: Checkout du code
@@ -74,11 +61,3 @@ jobs:
           file: docker/Dockerfile.streamlit
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/churnguard-streamlit:latest
-```
-
-Ensuite ajoute les secrets Docker Hub sur GitHub :
-```
-GitHub → ton repo → Settings → Secrets and variables → Actions → New secret
-
-DOCKER_USERNAME → ton username Docker Hub
-DOCKER_PASSWORD → ton password Docker Hub
