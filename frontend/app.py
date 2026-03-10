@@ -5,8 +5,8 @@
 import streamlit as st
 import requests
 import json
-
-API_URL = "http://127.0.0.1:8000"
+import os
+API_URL = os.getenv("API_URL", "http://127.0.0.1:8000")
 
 st.set_page_config(
     page_title="ChurnGuard",
