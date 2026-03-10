@@ -1,0 +1,23 @@
+artifact_path: /home/romaric420/apprentissage_Niveau_2/classification_churn/notebooks/mlruns/1/models/m-2efe82b1372349148d57bfe00f6464ff/artifacts
+flavors:
+  python_function:
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.sklearn
+    model_path: model.pkl
+    predict_fn: predict
+    python_version: 3.12.9
+  sklearn:
+    code: null
+    pickled_model: model.pkl
+    serialization_format: cloudpickle
+    sklearn_version: 1.8.0
+    skops_trusted_types: null
+mlflow_version: 3.10.0
+model_id: m-2efe82b1372349148d57bfe00f6464ff
+model_size_bytes: 6236
+model_uuid: m-2efe82b1372349148d57bfe00f6464ff
+prompts: null
+run_id: d10681386089471393c7aa0fe576c3c8
+utc_time_created: '2026-03-09 21:54:58.889266'
