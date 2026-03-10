@@ -1,0 +1,39 @@
+# docker/docker-compose.yml
+# Orchestre les deux services API et Streamlit
+# Les deux containers partagent le même réseau interne
+
+version: "3.9"
+
+services:
+
+  api:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.api
+    container_name: churnguard_api
+    ports:
+      - "8000:8000"
+    networks:
+      - churnguard_network
+    restart: unless-stopped
+
+  streamlit:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.streamlit
+    container_name: churnguard_streamlit
+    ports:
+      - "8501:8501"
+    environment:
+      # L'URL de l'API depuis le container Streamlit
+      # On utilise le nom du service Docker, pas localhost
+      - API_URL=http://api:8000
+    depends_on:
+      - api
+    networks:
+      - churnguard_network
+    restart: unless-stopped
+
+networks:
+  churnguard_network:
+    driver: bridge

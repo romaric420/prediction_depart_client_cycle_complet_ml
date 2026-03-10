@@ -1,0 +1,22 @@
+# docker/Dockerfile.streamlit
+# Image Docker pour le dashboard Streamlit ChurnGuard
+
+FROM python:3.12-slim
+
+WORKDIR /app
+
+COPY pyproject.toml .
+COPY uv.lock .
+
+RUN pip install uv --no-cache-dir && \
+    uv sync --frozen --no-dev
+
+COPY src/        ./src/
+COPY frontend/   ./frontend/
+
+# Port exposé par Streamlit
+EXPOSE 8501
+
+# Streamlit nécessite ces options pour tourner dans Docker
+CMD ["uv", "run", "streamlit", "run", "frontend/app.py", \
+     "--server.port=8501", "--server.address=0.0.0.0"]

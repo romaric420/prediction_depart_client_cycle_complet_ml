@@ -1,0 +1,28 @@
+# docker/Dockerfile.api
+# Image Docker pour l'API FastAPI ChurnGuard
+# Base : python3.12-slim pour minimiser la taille de l'image
+
+FROM python:3.12-slim
+
+# Dossier de travail dans le container
+WORKDIR /app
+
+# Copier les dépendances en premier pour profiter du cache Docker
+# Si pyproject.toml ne change pas → cette couche est cachée
+COPY pyproject.toml .
+COPY uv.lock .
+
+# Installer uv puis les dépendances
+RUN pip install uv --no-cache-dir && \
+    uv sync --frozen --no-dev
+
+# Copier le code source
+COPY src/        ./src/
+COPY backend/    ./backend/
+COPY models/     ./models/
+
+# Port exposé par l'API
+EXPOSE 8000
+
+# Commande de démarrage
+CMD ["uv", "run", "uvicorn", "backend.api:app", "--host", "0.0.0.0", "--port", "8000"]
